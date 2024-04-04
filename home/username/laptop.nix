@@ -8,6 +8,6 @@
     ./global
     ./features/desktop/wireless
     ./features/desktop/gnome
-    ./features/productivity
+    #./features/productivity
   ];
 }

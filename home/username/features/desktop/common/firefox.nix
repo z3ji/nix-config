@@ -1,12 +1,16 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   programs.firefox = {
     enable = true;
     # TODO: Change username
     profiles.username = {
       bookmarks = {};
-      extensions = with pkgs.inputs.firefox-addons; [
-        ublock-origin
-      ];
+      #extensions = with pkgs.inputs.firefox-addons; [
+      #  ublock-origin
+      #];
       bookmarks = {};
       settings = {
         "browser.disableResetPrompt" = true;

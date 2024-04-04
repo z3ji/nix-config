@@ -4,21 +4,21 @@
   outputs,
   ...
 }: {
-  imports =
-    [
-      ./auto-upgrade.nix
-      ./gamemode.nix
-      ./locale.nix
-      ./nix.nix
-      ./steam-hardware.nix
-      ./systemd-initrd.nix
-    ]
-    ++ (builtins.attrValues outputs.nixosModules);
+  imports = [
+    inputs.home-manager.nixosModules.home-manager
+    ./auto-upgrade.nix
+    ./gamemode.nix
+    ./locale.nix
+    ./nix.nix
+    ./steam-hardware.nix
+    ./systemd-initrd.nix
+  ];
+  #++ (builtins.attrValues outputs.nixosModules);
 
   home-manager.extraSpecialArgs = {inherit inputs outputs;};
 
   nixpkgs = {
-    overlays = builtins.attrValues outputs.overlays;
+    #overlays = builtins.attrValues outputs.overlays;
     config = {
       allowUnfree = true;
     };

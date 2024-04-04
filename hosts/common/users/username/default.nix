@@ -5,11 +5,11 @@
 }: let
   ifTheyExist = groups: builtins.filter (group: builtins.hasAttr group config.users.groups) groups;
 in {
-  users.mutableUsers = false;
+  users.mutableUsers = true;
   users.users.username = {
     # TODO: Change username
     isNormalUser = true;
-    sheel = pkgs.zsh;
+    shell = pkgs.zsh;
     extraGroups =
       [
         "wheel"
@@ -17,6 +17,7 @@ in {
         "audio"
       ]
       ++ ifTheyExist [
+        "networkmanager"
         "network"
         "docker"
         "git"
@@ -24,6 +25,7 @@ in {
 
     packages = [pkgs.home-manager];
   };
+  programs.zsh.enable = true;
 
   home-manager.users.username = import ../../../../home/username/${config.networking.hostName}.nix;
 }
