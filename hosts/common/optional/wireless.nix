@@ -1,12 +1,16 @@
+# This Nix expression configures wireless networking and ensures the existence of a network group.
 {
+  # Import commonly used components from the input
   config,
   lib,
   pkgs,
   ...
 }: {
-  networking.wireless = {
+  # Configure network manager
+  networking.networkmanager = {
     enable = true;
   };
-  # Ensure group exists
-  users.groups.network = {};
+
+  # Ensure the existence of a networkmanager group
+  users.groups.networkmanager = {};
 }

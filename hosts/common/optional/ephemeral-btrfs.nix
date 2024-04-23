@@ -1,11 +1,13 @@
-# This file contains an ephemeral btrfs root configuration
-# TODO: perhaps partition using disko in the future
+# This Nix expression configures an ephemeral Btrfs root configuration.
+# It sets up the Btrfs file systems and systemd service for root rollback.
 {
   lib,
   config,
   ...
 }: let
+  # Extract hostname from networking configuration
   hostname = config.networking.hostName;
+  # Script to wipe and restore root subvolume
   wipeScript = ''
     mkdir /tmp -p
     MNTPOINT=$(mktemp -d)
@@ -26,11 +28,15 @@
       btrfs subvolume snapshot "$MNTPOINT/root-blank" "$MNTPOINT/root"
     )
   '';
+  # Check if systemd is enabled in the initrd
   phase1Systemd = config.boot.initrd.systemd.enable;
 in {
   boot.initrd = {
+    # Specify supported file systems for the initrd
     supportedFilesystems = ["btrfs"];
+    # Run the wipeScript before mounting root if systemd is not enabled in the initrd
     postDeviceCommands = lib.mkIf (!phase1Systemd) (lib.mkBefore wipeScript);
+    # Configure systemd service to restore root subvolume
     systemd.services.restore-root = lib.mkIf phase1Systemd {
       description = "Rollback btrfs rootfs";
       wantedBy = ["initrd.target"];
@@ -47,6 +53,7 @@ in {
     };
   };
 
+  # Configure Btrfs file systems
   fileSystems = {
     "/" = {
       device = "/dev/disk/by-label/${hostname}";

@@ -1,12 +1,15 @@
+# This Nix expression configures various boot, file system, and hardware settings.
 {config, ...}: {
+  # Define imports for optional configuration modules
   imports = [
-    ../common/optional/ephemeral-btrfs.nix
+    #../common/optional/ephemeral-btrfs.nix
   ];
 
+  # Configure boot settings
   boot = {
     initrd = {
       availableKernelModules = ["xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod"];
-      kernelModules = ["kvm-intel" "wl"];
+      kernelModules = [];
     };
     loader = {
       systemd-boot = {
@@ -15,28 +18,33 @@
       };
       efi.canTouchEfiVariables = true;
     };
+    kernelModules = ["kvm-intel" "wl"];
     extraModulePackages = [config.boot.kernelPackages.broadcom_sta];
   };
 
-  fileSystems = {
-    "/boot" = {
-      device = "/dev/disk/by-label/ESP";
-      fsType = "vfat";
-    };
+  # Configure boot file system
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/BOOT";
+    fsType = "vfat";
   };
 
+  # Configure root file system
+  fileSystems."/" = {
+    device = "/dev/disk/by-label/NixOS";
+    fsType = "ext4";
+  };
+
+
+  # Configure swap devices
   swapDevices = [
     {
-      device = "/swap/swapfile";
-      size = 8196;
+      #device = "/dev/disk/by-label/swap";
+      device = "/dev/disk/by-uuid/a2da2c89-5707-41bd-bc94-5f97371b4e68";
     }
   ];
 
-  #fileSystems."/" = {
-  #  device = "/dev/disk/by-uuid/be1b8adc-4e64-4b6a-a213-1f9f2f4b0044";
-  #  fsType = "ext4";
-  #};
-
+  # Specify host platform system
   nixpkgs.hostPlatform.system = "x86_64-linux";
+  # Enable microcode update for Intel CPUs
   hardware.cpu.intel.updateMicrocode = true;
 }
